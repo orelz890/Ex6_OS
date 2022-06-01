@@ -25,9 +25,12 @@ void* handleAO(void* ao) {
     printf("Im handling this ao!\n");
     fflush(stdout);
     AO* my_ao = (AO*)ao;
-    while (!my_ao->Q->empty() && my_ao->is_active) {
-        // Activate the first func of the AO and send the result to the second func
-        my_ao->f2(my_ao->f1(deQ(my_ao->Q)));
+    while (my_ao->is_active) {
+        if (!my_ao->Q->empty())
+        {
+            // Activate the first func of the AO and send the result to the second func
+            my_ao->f2(my_ao->f1(deQ(my_ao->Q)));
+        }        
     }
     pthread_cancel(my_ao->t_id);
     delete my_ao;
