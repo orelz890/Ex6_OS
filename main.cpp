@@ -100,15 +100,19 @@ int main()
     ao2 = newAO(createQ(),&f2,&fill_Q3);
     ao3 = newAO(createQ(),&print_data,&send_data);
 
-    std::cin.getline(c,sizeof(c));
-    std::cin.getline(d,sizeof(d));
+    // std::cin.getline(c,sizeof(c));
+    // std::cin.getline(d,sizeof(d));
 
-    enQ(c,ao1->Q, -1);
-    enQ(d,ao1->Q, -1);
-    while (1)
-    {
-        sleep(1);
-    }
-    
-    // destroyAO(ao);
+    enQ(a,ao1->Q, -1);
+    enQ(b,ao1->Q, -1);
+
+    sleep(1);
+
+    destroyAO(ao1);
+
+    ao1 = newAO(createQ(),&f1,&fill_Q2);
+    enQ(a,ao1->Q, -1);
+
+    sleep(2);
+
 }

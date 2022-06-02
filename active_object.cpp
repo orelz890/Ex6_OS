@@ -12,6 +12,12 @@ Functions on a given AO
 void destroyAO(void* ao) {
     AO* my_ao = (AO*)ao;
     my_ao->is_active=false;
+    pthread_cancel(my_ao->t_id);
+    delete my_ao->Q;
+    delete my_ao;
+    my_ao = NULL;
+    printf("\nAO terminated!\n");
+    fflush(stdout);
 }
 
 
@@ -35,10 +41,6 @@ void* handleAO(void* ao) {
             my_ao->f2(my_ao->f1(de));
         }
     }
-    pthread_cancel(my_ao->t_id);
-    delete my_ao;
-    printf("AO terminated!\n");
-    fflush(stdout);
     return ao;
 }
 
