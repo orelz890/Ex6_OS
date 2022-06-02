@@ -20,5 +20,21 @@ void* newReactor()
 }
 
 
-void InstallHandler(Reactor* p_r, void*(f)(void*), int file_descriptor);
-void RemoveHandler(Reactor* p_r, int _fd);
+void InstallHandler(void* p_r, void*(f)(void*), int _fd)
+{
+    Reactor* pr = (Reactor*)p_r;
+    pr->fd = _fd;
+    pr->func = f;
+    pthread_create(&pr->t_id, NULL, f, p_r);
+}
+
+
+void RemoveHandler(void* p_r)
+{
+    Reactor* pr = (Reactor*)p_r;
+    // Make calling thread wait for this thread termination
+    pthread_join(pr->t_id, NULL);
+    //                                           pthread_cancel?????   
+    pr->fd = -1;
+    pr->func = NULL;
+}
