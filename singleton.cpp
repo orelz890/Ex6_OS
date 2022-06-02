@@ -1,7 +1,7 @@
 // Aidded by this site:
 // https://codereview.stackexchange.com/questions/173929/modern-c-singleton-template
 
-#include "singalton.hpp"
+#include "singleton.hpp"
 #include <cassert>
 #include <iostream>
 #include <pthread.h>
