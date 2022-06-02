@@ -1,5 +1,3 @@
-all: server client
-
 client: Client
 	./Client 127.0.0.1
 
@@ -24,5 +22,11 @@ singleton: Singleton
 Singleton: singleton.cpp singleton.hpp
 	g++ -o Singleton singleton.cpp
 
+test1: serverTest
+	./serverTest
+
+serverTest: server_test.cpp
+	g++ -o serverTest server_test.cpp
+
 clean:
-	rm -f *.o *.out Server Client Guard Singleton
+	rm -f *.o *.out Server Client Guard Singleton serverTest

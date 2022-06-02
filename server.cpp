@@ -55,23 +55,20 @@ void* f1(void* data){
     {   
         // std::cout << "f1-data = " << (char*)p->first << '\n';
         char* str = (char*)p->first;
-        while (*str) {
-            if (!isspace(*str) || !isblank(*str))
+        int len = strlen(str);
+        for (int i = 0; i < len; i++)
+        {
+            if (!isspace(str[i]) || !isblank(str[i]))
             {
-                if (*str >= 'a' && *str <= 'z')
+                if (str[i] >= 'a' && str[i] <= 'z')
                 {
-                    *str = (((*str - 'a') + 1) % 26) + 'a';
+                    str[i] = (((str[i] - 'a') + 1) % 26) + 'a';
                 }
-                else if ((*str >= 'A' && *str <= 'Z'))
+                else if ((str[i] >= 'A' && str[i] <= 'Z'))
                 {
-                    *str = (((*str - 'A') + 1) % 26) + 'A';
-                }
-                else if(*str != '\n')
-                {
-                    throw std::runtime_error("Input error!");
+                    str[i] = (((str[i] - 'A') + 1) % 26) + 'A';
                 }
             }
-            str += 1;
         }
         // std::cout << "f1-ans = " << (char*)p->first << '\n';
     }
@@ -84,7 +81,8 @@ void* f2(void* data){
     {   
         // std::cout << "f2-data = " << (char*)p->first << '\n';
         char* str = (char*)p->first;
-        for (int j = 0; j < sizeof(str)-1; j++)
+        int len = strlen(str);
+        for (int j = 0; j < len; j++)
         {
             str[j] = toupper(str[j]);
         }
@@ -166,12 +164,23 @@ void *creat_thread(void *newfd) {
         }
         std::cout << txt_buf <<"\n";
         fflush(stdout);
-        if (strcmp(txt_buf, "crtl_c") == 0)
+        if (strlen(txt_buf) == 0)
+        {
+            std::string msg = "You pressed enter by mistake";
+            if (send(new_fd, msg.c_str(), msg.length(),0) == -1)
+            {
+                perror("Error- send enter error");
+                exit(1);
+            }
+        }
+        else if (strncmp(txt_buf, "ctrl_c",6) == 0)
         {
             std::cout << "Client " << (new_fd - 3) << " disconnected!\n";
             break;
         }
-        enQ(txt_buf,ao1->Q, new_fd);
+        else{
+            enQ(txt_buf,ao1->Q, new_fd);
+        }
         // std::cout << "enqed: " << (char*)ao1->Q->enqueue(txt_buf,new_fd) << '\n';
     }
     close(new_fd);

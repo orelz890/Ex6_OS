@@ -46,7 +46,7 @@ bool str_comp(std::string a, std::string b){
 
 void signal_handler(int signal)
 {
-    std::string msg = "crtl_c";
+    std::string msg = "ctrl_c";
     int is_sent = send(sockfd, msg.c_str(),msg.length(), 0);
     if (is_sent == -1)
     {
