@@ -86,6 +86,7 @@ int main(int argc, char *argv[])
     printf("client: connecting to %s\n", s);
 
     freeaddrinfo(servinfo); // all done with this structure
+    
     if ((numbytes = recv(sockfd, buf, MAXDATASIZE-1, 0)) == -1) {
         perror("recv");
         exit(1);
@@ -99,11 +100,12 @@ int main(int argc, char *argv[])
     char txt[1024];
 
     while(1){
-        std::cout<< "Enter a coomend (PUSH <text>/POP/TOP)\n";
+        std::cout<< "Enter a txt to cifer..\n";
         fflush(stdout);
         memset(txt,0,sizeof(txt));
         std::cin.getline(txt,sizeof(txt));
         // std::cout << "txt == " << txt << '\n';
+        // fflush(stdout);
         
         is_sent = send(sockfd, txt,sizeof(txt), 0);
         if (is_sent == -1)
@@ -111,11 +113,7 @@ int main(int argc, char *argv[])
             perror("send commend error\n");
             exit(1);
         }
-        if (strncmp(txt,"EXIT",4) == 0)
-        {
-            sleep(1);
-            break;
-        }
+
         sleep(0.1);
         memset(txt,0,sizeof(txt));
         received = recv(sockfd,txt,sizeof(txt),0);
@@ -124,10 +122,7 @@ int main(int argc, char *argv[])
             perror("recv error - commend response\n");
         }
         std::cout << txt << '\n';
-
-    }
-
-    
+    }    
     close(sockfd);
 
     return 0;

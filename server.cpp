@@ -1,6 +1,12 @@
 /*
 ** server.c -- a stream socket server demo
 */
+
+// How to run:
+// server:
+// g++ -pthread -o server server.cpp queue.cpp queue.hpp active_object.hpp active_object.cpp
+// client:
+// 
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -44,7 +50,9 @@ void *incoming_addr(struct sockaddr *socket_addr)
 
 
 void* f1(void* data){
-    char* str = (char*)data;
+    std::pair<void*,int>* p = (std::pair<void*,int>*)data;
+    std::cout << "f1-data = " << (char*)p->first << '\n';
+    char* str = (char*)p->first;
     while (*str) {
         if (!isspace(*str) || !isblank(*str))
         {
@@ -56,48 +64,60 @@ void* f1(void* data){
             {
                 *str = (((*str - 'A') + 1) % 26) + 'A';
             }
-            else
+            else if(*str != '\n')
             {
                 throw std::runtime_error("Input error!");
             }
         }
         str += 1;
     }
+    std::cout << "f1-ans = " << (char*)p->first << '\n';
     return data;
 }
 
 void* f2(void* data){
-
-    char* str = (char*)data;
+    std::pair<void*,int>* p = (std::pair<void*,int>*)data;
+    std::cout << "f2-data = " << (char*)p->first << '\n';
+    char* str = (char*)p->first;
     for (int j = 0; j < sizeof(str)-1; j++)
     {
         str[j] = toupper(str[j]);
     }
-    printf("f2 = %s\n", (char*)data);
+    std::cout << "f2-ans = " << (char*)p->first << '\n';
     fflush(stdout);
+    delete p;
     return data;
 }
 
 
 void* fill_Q2(void* data){
-    return ao2->Q->enqueue(data);
+    std::pair<void*,int>* p = (std::pair<void*,int>*)data;
+    return ao2->Q->enqueue(p->first,p->second);
 }
 
 
 void* fill_Q3(void* data){
-    return ao3->Q->enqueue(data);
+    std::pair<void*,int>* p = (std::pair<void*,int>*)data;
+    return ao3->Q->enqueue(p->first,p->second);
 }
 
 
 void* print_data(void* data){
-    std::cout << data;
-    return ao3->Q->enqueue(data);
+    std::pair<void*,int>* p = (std::pair<void*,int>*)data;
+    std::cout << p->first;
+    return data;
 }
 
 
 void* send_data(void* data){
-    std::cout << data;
-    return ao3->Q->enqueue(data);
+    std::pair<void*,int>* p = (std::pair<void*,int>*)data;
+    std::string msg = (char*)p->first;
+    int num = send(p->second , msg.c_str(), msg.length(), 0);
+    if (num == -1)
+    {
+        perror("Send eror\n");
+    }
+    return data;
 }
 
 
@@ -119,7 +139,10 @@ void *creat_thread(void *newfd) {
             perror("Recv txt error\n");
             break;
         }
-        ao1->Q->enqueue(txt_buf);
+        std::cout << txt_buf <<"\n";
+        fflush(stdout);
+        enQ(txt_buf,ao1->Q, new_fd);
+        // std::cout << "enqed: " << (char*)ao1->Q->enqueue(txt_buf,new_fd) << '\n';
     }
     close(new_fd);
     return 0;

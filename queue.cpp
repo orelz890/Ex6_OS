@@ -25,34 +25,37 @@ my_Queue::~my_Queue()
 }
 
 
-void my_Queue::enqueue(void* data)
+void* my_Queue::enqueue(void* data, int fd)
 {
     pthread_mutex_lock(&this->my_mutex);
+    printf("trying to enq: %s\n",(char*)data);
     if (this->head == NULL)
     {
-        node* new_node = new node(data);
+        node* new_node = new node(data,fd);
         this->head = new_node;
         this->tail = new_node;
     }
     else
     {
-        node* new_node = new node(data,this->tail,NULL);
+        node* new_node = new node(data,this->tail,NULL,fd);
         this->tail->next = new_node;
         this->tail = this->tail->next;
     }
     this->size++;
     pthread_mutex_unlock(&this->my_mutex);
     pthread_cond_signal(&this->my_cond);
+    return data;
 }
 
 
-void* my_Queue::dequeue()
+std::pair<void*,int>* my_Queue::dequeue()
 {
     pthread_mutex_lock(&this->my_mutex);
     if (this->tail != NULL)
     {
         node* temp = this->tail->prev;
         void* data = this->tail->data;
+        int fd = this->tail->_fd;
         delete this->tail;
         this->size--;
         this->tail = temp;
@@ -66,11 +69,11 @@ void* my_Queue::dequeue()
         }
         pthread_mutex_unlock(&this->my_mutex);
         pthread_cond_signal(&this->my_cond);
-        return data;
+        return new std::pair<void*,int>{data, fd};
     }
     pthread_mutex_unlock(&this->my_mutex);
     pthread_cond_signal(&this->my_cond);
-    return NULL;
+    return new std::pair<void*,int>{NULL, -1};
 }
 
 bool my_Queue::empty()
@@ -93,13 +96,13 @@ void destroyQ(void* q)
 }
 
 
-void enQ(void* data, void* q)
+void* enQ(void* data, void* q, int fd)
 {
-    ((my_Queue*)q)->enqueue((node*)data);
+    return ((my_Queue*)q)->enqueue((node*)data,fd);
 }
 
 
-void* deQ(void* q)
+std::pair<void*,int>* deQ(void* q)
 {
     return ((my_Queue*)q)->dequeue();
 }

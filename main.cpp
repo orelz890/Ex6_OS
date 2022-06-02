@@ -4,22 +4,40 @@
 #include "active_object.hpp"
 #include <ctype.h>
 
-// void* f1(void* a)
-// {
-//     printf("im in f1\n");
-//     fflush(stdout);
-//     return a;
-// }
 
-// void* f2(void* b)
-// {
-//     printf("im in f2\n");
-//     fflush(stdout);
-//     return b;
-// }
+AO* ao1;
+AO* ao2;
+AO* ao3;
+
+void* fill_Q2(void* data){
+    std::pair<void*,int>* p = (std::pair<void*,int>*)data;
+    return ao2->Q->enqueue(p->first,p->second);
+}
+
+
+void* fill_Q3(void* data){
+    std::pair<void*,int>* p = (std::pair<void*,int>*)data;
+    return ao3->Q->enqueue(p->first,p->second);
+}
+
+
+void* print_data(void* data){
+    std::pair<void*,int>* p = (std::pair<void*,int>*)data;
+    std::cout << p->first;
+    return data;
+}
+
+
+void* send_data(void* data){
+
+    return data;
+}
+
 
 void* f1(void* data){
-    char* str = (char*)data;
+    std::pair<void*,int>* p = (std::pair<void*,int>*)data;
+    std::cout << "f1-data = " << (char*)p->first << '\n';
+    char* str = (char*)p->first;
     while (*str) {
         if (!isspace(*str) || !isblank(*str))
         {
@@ -31,25 +49,28 @@ void* f1(void* data){
             {
                 *str = (((*str - 'A') + 1) % 26) + 'A';
             }
-            else
+            else if(*str != '\n')
             {
                 throw std::runtime_error("Input error!");
             }
         }
         str += 1;
     }
+    // std::cout << "f1-ans = " << (char*)p->first << '\n';
     return data;
 }
 
 void* f2(void* data){
-
-    char* str = (char*)data;
+    std::pair<void*,int>* p = (std::pair<void*,int>*)data;
+    // std::cout << "f2-data = " << (char*)p->first << '\n';
+    char* str = (char*)p->first;
     for (int j = 0; j < sizeof(str)-1; j++)
     {
         str[j] = toupper(str[j]);
     }
-    printf("f2 = %s\n", (char*)data);
+    std::cout << "f2-ans = " << (char*)p->first << '\n';
     fflush(stdout);
+    delete p;
     return data;
 }
 
@@ -59,6 +80,8 @@ int main()
     my_Queue q{};
     char a[1024] = "aaa";
     char b[1024] = "BBB";
+    char c[1024];
+    char d[1024];
 
     // enQ(a,&q);
     // char* de = (char*)deQ(&q);
@@ -72,9 +95,19 @@ int main()
     // de = (char*)deQ(&q);
     // std::cout << '\n' << de << '\n';
 
-    enQ(a,&q);
-    enQ(b,&q);
-    AO* ao = newAO(&q,&f1,&f2);
+    ao1 = newAO(createQ(),&f1,&fill_Q2);
+    ao2 = newAO(createQ(),&f2,&fill_Q3);
+    ao3 = newAO(createQ(),&print_data,&send_data);
+
+    std::cin.getline(c,sizeof(c));
+    std::cin.getline(d,sizeof(d));
+
+    enQ(c,ao1->Q, -1);
+    enQ(d,ao1->Q, -1);
+    while (1)
+    {
+        /* code */
+    }
     
     // destroyAO(ao);
 }
