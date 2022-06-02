@@ -140,7 +140,7 @@ int main(int argc, char *argv[])
         {
             perror("recv error - commend response\n");
         }
-        std::cout << txt << '\n';
+        std::cout << "Server returned: "<< txt << '\n';
     }    
     close(sockfd);
 

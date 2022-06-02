@@ -22,16 +22,21 @@ int listener; // Listening socket descriptor
 int fd_count;
 struct pollfd *pfds;
 
-
 void *thread_handler(void *p_reactor)
 {
-    Reactor* p_r = (Reactor*)p_reactor;
+    Reactor *p_r = (Reactor *)p_reactor;
+    std::string msg = "You are connected now!\n";
+    if (send(p_r->fd, msg.c_str() , msg.length(), 0) == -1)  {
+        perror("send");
+        exit(1);
+    }
+
     char buf[BUF_SIZE];
     int error_flag;
     while (1)
     {
-        memset(buf,0,BUF_SIZE);
-        if (recv(p_r->fd, buf, sizeof(buf), 0) == -1)
+        memset(buf, 0, BUF_SIZE);
+        if (recv(p_r->fd, buf, BUF_SIZE, 0) == -1)
         {
             perror("ERROR- recv");
             close(p_r->fd);
@@ -39,13 +44,14 @@ void *thread_handler(void *p_reactor)
         }
         else
         {
+            std::cout << "Got from client: " << buf << '\n';
             // Find the fd that changed and handle the changes
-            for (int i = 0; i < fd_count + 1; i++)
+            for (int i = 0; i < fd_count; i++)
             {
-                printf("fd_count = %d , client_fd = %d, listener = %d ,reactor_fd = %d ", fd_count, pfds[i].fd, listener, p_r->fd);
-                if (pfds[i].fd != listener && pfds[i].fd != p_r->fd)
+                if (pfds[i].fd != listener && pfds[i].fd == p_r->fd)
                 {
-                    if(send(pfds[i].fd, buf, BUF_SIZE, 0) == -1)
+                    printf("fd_count = %d , client_fd = %d, listener = %d ,reactor_fd = %d ", fd_count, pfds[i].fd, listener, p_r->fd);
+                    if (send(pfds[i].fd, buf, BUF_SIZE, 0) == -1)
                     {
                         perror("ERROR -thread_handler- send ");
                         exit(1);
@@ -151,7 +157,6 @@ void del_from_pfds(struct pollfd pfds[], int i, int *fd_count)
     (*fd_count)--;
 }
 
-
 // Main
 int main(void)
 {
@@ -215,8 +220,9 @@ int main(void)
 
                     if (newfd == -1)
                     {
-                        perror("accept");
+                        perror("ERROR - accept");
                     }
+                    // We got a new client!
                     else
                     {
                         add_to_pfds(&pfds, newfd, &fd_count, &fd_size);
@@ -228,7 +234,7 @@ int main(void)
                                          remoteIP, INET6_ADDRSTRLEN),
                                newfd);
                         // handle this fd
-                        InstallHandler(newReactor(),&thread_handler,newfd);
+                        InstallHandler(newReactor(), &thread_handler, newfd);
                     }
                 }
                 else
