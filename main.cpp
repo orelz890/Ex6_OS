@@ -1,8 +1,9 @@
 // How to run:
-// g++ -pthread -o a.out queue.hpp queue.cpp main.cpp active_object.hpp active_object.cpp Guard.hpp
+// g++ -pthread -o a.out queue.hpp queue.cpp main.cpp active_object.hpp active_object.cpp
 // #include "queue.hpp"
 #include "active_object.hpp"
 #include <ctype.h>
+#include <unistd.h>
 
 
 AO* ao1;
@@ -24,6 +25,7 @@ void* fill_Q3(void* data){
 void* print_data(void* data){
     std::pair<void*,int>* p = (std::pair<void*,int>*)data;
     std::cout << p->first;
+    delete p;
     return data;
 }
 
@@ -70,7 +72,6 @@ void* f2(void* data){
     }
     std::cout << "f2-ans = " << (char*)p->first << '\n';
     fflush(stdout);
-    delete p;
     return data;
 }
 
@@ -106,7 +107,7 @@ int main()
     enQ(d,ao1->Q, -1);
     while (1)
     {
-        /* code */
+        sleep(1);
     }
     
     // destroyAO(ao);

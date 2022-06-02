@@ -1,31 +1,17 @@
 #pragma once
-
 #include <iostream>
-// #include <string>
 
 
 typedef struct node
 {
-    void* data;
+    char* data;
     node* next;
     node* prev;
     int _fd;
 
-    node(void* new_data, int fd)
-    {
-        this->data = new_data;
-        this->next = NULL;
-        this->prev = NULL;
-        this->_fd = fd;
-    }
-
-    node(void* new_data, node* prev_node, node* next_node, int fd)
-    {
-        this->data = new_data;
-        this->prev = prev_node;
-        this->next = next_node;
-        this->_fd = fd; 
-    }
+    node(void* new_data, node* prev_node, node* next_node, int fd);
+    node(void* new_data, int fd);
+    ~node();
 }node;
 
 

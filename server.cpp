@@ -51,71 +51,96 @@ void *incoming_addr(struct sockaddr *socket_addr)
 
 void* f1(void* data){
     std::pair<void*,int>* p = (std::pair<void*,int>*)data;
-    std::cout << "f1-data = " << (char*)p->first << '\n';
-    char* str = (char*)p->first;
-    while (*str) {
-        if (!isspace(*str) || !isblank(*str))
-        {
-            if (*str >= 'a' && *str <= 'z')
+    if (p->first != NULL)
+    {   
+        // std::cout << "f1-data = " << (char*)p->first << '\n';
+        char* str = (char*)p->first;
+        while (*str) {
+            if (!isspace(*str) || !isblank(*str))
             {
-                *str = (((*str - 'a') + 1) % 26) + 'a';
+                if (*str >= 'a' && *str <= 'z')
+                {
+                    *str = (((*str - 'a') + 1) % 26) + 'a';
+                }
+                else if ((*str >= 'A' && *str <= 'Z'))
+                {
+                    *str = (((*str - 'A') + 1) % 26) + 'A';
+                }
+                else if(*str != '\n')
+                {
+                    throw std::runtime_error("Input error!");
+                }
             }
-            else if ((*str >= 'A' && *str <= 'Z'))
-            {
-                *str = (((*str - 'A') + 1) % 26) + 'A';
-            }
-            else if(*str != '\n')
-            {
-                throw std::runtime_error("Input error!");
-            }
+            str += 1;
         }
-        str += 1;
+        // std::cout << "f1-ans = " << (char*)p->first << '\n';
     }
-    std::cout << "f1-ans = " << (char*)p->first << '\n';
     return data;
 }
 
 void* f2(void* data){
     std::pair<void*,int>* p = (std::pair<void*,int>*)data;
-    std::cout << "f2-data = " << (char*)p->first << '\n';
-    char* str = (char*)p->first;
-    for (int j = 0; j < sizeof(str)-1; j++)
-    {
-        str[j] = toupper(str[j]);
+    if (p->first != NULL)
+    {   
+        // std::cout << "f2-data = " << (char*)p->first << '\n';
+        char* str = (char*)p->first;
+        for (int j = 0; j < sizeof(str)-1; j++)
+        {
+            str[j] = toupper(str[j]);
+        }
+        // std::cout << "f2-ans = " << (char*)p->first << '\n';
+        // fflush(stdout);
     }
-    std::cout << "f2-ans = " << (char*)p->first << '\n';
-    fflush(stdout);
-    delete p;
     return data;
 }
 
 
 void* fill_Q2(void* data){
     std::pair<void*,int>* p = (std::pair<void*,int>*)data;
-    return ao2->Q->enqueue(p->first,p->second);
+    void* ans = NULL;
+    if (p->first != NULL)
+    {   
+        ans = ao2->Q->enqueue(p->first,p->second);
+        delete (char*)p->first;
+    }
+    return ans;
 }
 
 
 void* fill_Q3(void* data){
     std::pair<void*,int>* p = (std::pair<void*,int>*)data;
-    return ao3->Q->enqueue(p->first,p->second);
+    void* ans = NULL;
+    if (p->first != NULL)
+    {   
+        ans = ao3->Q->enqueue(p->first,p->second);
+        delete (char*)p->first;
+    }
+    return ans;
 }
 
 
 void* print_data(void* data){
     std::pair<void*,int>* p = (std::pair<void*,int>*)data;
-    std::cout << p->first;
+    if (p->first != NULL)
+    {   
+        std::cout << p->first;
+    }
     return data;
 }
 
 
 void* send_data(void* data){
     std::pair<void*,int>* p = (std::pair<void*,int>*)data;
-    std::string msg = (char*)p->first;
-    int num = send(p->second , msg.c_str(), msg.length(), 0);
-    if (num == -1)
-    {
-        perror("Send eror\n");
+    if (p->first != NULL)
+    {    
+        std::string msg = (char*)p->first;
+        int num = send(p->second , msg.c_str(), msg.length(), 0);
+        if (num == -1)
+        {
+            perror("Send eror\n");
+        }
+        delete (char*)p->first;
+        delete p;
     }
     return data;
 }
@@ -141,6 +166,11 @@ void *creat_thread(void *newfd) {
         }
         std::cout << txt_buf <<"\n";
         fflush(stdout);
+        if (strcmp(txt_buf, "crtl_c") == 0)
+        {
+            std::cout << "Client " << (new_fd - 3) << " disconnected!\n";
+            break;
+        }
         enQ(txt_buf,ao1->Q, new_fd);
         // std::cout << "enqed: " << (char*)ao1->Q->enqueue(txt_buf,new_fd) << '\n';
     }

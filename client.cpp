@@ -13,10 +13,13 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <iostream>
+#include <csignal>
 
 #define PORT "6060" // the port client will be connecting to 
 
 #define MAXDATASIZE 1024 // max number of bytes we can get at once 
+int sockfd, numbytes;  
+
 
 // get sockaddr, IPv4 or IPv6:
 void *incoming_addr(struct sockaddr *sock_addr)
@@ -39,9 +42,25 @@ bool str_comp(std::string a, std::string b){
     }
     return true;
 }
+
+
+void signal_handler(int signal)
+{
+    std::string msg = "crtl_c";
+    int is_sent = send(sockfd, msg.c_str(),msg.length(), 0);
+    if (is_sent == -1)
+    {
+        perror("send commend error\n");
+        exit(1);
+    }
+    close(sockfd);
+    exit(0);
+}
+
+
 int main(int argc, char *argv[])
 {
-    int sockfd, numbytes;  
+    std::signal(SIGINT,signal_handler);
     char buf[MAXDATASIZE];
     struct addrinfo hints, *servinfo, *p;
     int rv;
