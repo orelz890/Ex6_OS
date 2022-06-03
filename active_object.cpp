@@ -65,37 +65,3 @@ AO::AO(my_Queue* q, void* (*func1)(void*), void* (*func2)(void*))
     }
     // pthread_join(this->t_id,NULL);
 }
-
-
-
-
-// void* f1(void* a)
-// {
-//     printf("im in f1\n");
-//     fflush(stdout);
-//     return a;
-// }
-
-// void* f2(void* b)
-// {
-//     printf("im in f2\n");
-//     fflush(stdout);
-//     return b;
-// }
-
-// int main(){
-//     my_Queue a{};
-//     char aaa[] = {'a','a','a'};
-//     a.enqueue(aaa);
-
-//     AO ao{&a,&f1,&f2};
-//     handleAO(&ao);
-
-// }
-
-// AO::~AO()
-// {
-//     delete this->t_id;
-//     this->is_active = false;
-//     printf("AO terminated!\n");
-// }

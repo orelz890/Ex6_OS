@@ -32,7 +32,6 @@ void *thread_handler(void *p_reactor)
     }
 
     char buf[BUF_SIZE];
-    int error_flag;
     while (1)
     {
         memset(buf, 0, BUF_SIZE);
@@ -54,7 +53,6 @@ void *thread_handler(void *p_reactor)
                     if (send(pfds[i].fd, buf, BUF_SIZE, 0) == -1)
                     {
                         perror("ERROR -thread_handler- send ");
-                        exit(1);
                     }
                 }
             }

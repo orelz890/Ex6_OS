@@ -3,8 +3,10 @@
 
 ## Write:
 + Thread safe queue, must implement:
-    * enqueue
-    * dequeue
+    * createQ
+    * destroyQ
+    * enQ
+    * deQ
 + Active_object, must implement:
     * newAO(queue*,func1*,func2*)
     * destroyAO(AO*)
@@ -31,27 +33,26 @@
 ## part 1,2,3:
 
 ### Run client & server:
-+ Stap 1: Open terminal & enter - make server
++ Step 1: Open terminal & enter - make server
 + Step 2: Open another terminal & enter - make client
 
 ### Run test:
-+ Stap 1: Open terminal & enter - make server
++ Step 1: Open terminal & enter - make server
 + Step 2: Open another terminal & enter - make test1
 
 
 ## part 4(Guard):
-+ Stap 1: Open terminal & enter - make guard
++ Step 1: Open terminal & enter - make guard
 
 
 ## part 5(Singleton):
-+ Stap 1: Open terminal & enter - make singleton
++ Step 1: Open terminal & enter - make singleton
 
 
-## part 6:
-+ Stap 1: Open terminal & enter - make pollserver
+## part 6(Reactor):
++ Step 1: Open terminal & enter - make pollserver
 + Step 2: Open another terminal & enter - make pollclient
 
 
 
 All done with the preperation, enjoy :)
-

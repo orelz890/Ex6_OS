@@ -1,4 +1,9 @@
-all: Client Server Guard Singleton serverTest Pollclient Pollserver
+
+ALL_FILES=Client Server Guard Singleton serverTest Pollclient Pollserver
+all: shared_object.so
+
+shared_object.so: $(ALL_FILES)
+	g++ -shared -fPIC -pthread $(ALL_FILES) -o shared_object.so
 
 client: Client
 	./Client 127.0.0.1
@@ -30,11 +35,11 @@ pollserver: Pollserver
 Server: server.cpp queue.hpp queue.cpp active_object.cpp active_object.hpp 
 	g++ -pthread -o Server server.cpp queue.cpp active_object.cpp
 
-Guard: Guard.cpp
-	g++ -o Guard -pthread Guard.cpp
+Guard: Guard.cpp Guard.hpp TestGuard.cpp
+	g++ -o Guard -pthread Guard.cpp TestGuard.cpp
 
 Singleton: singleton.cpp singleton.hpp
-	g++ -o Singleton singleton.cpp
+	g++ -o -pthread Singleton singleton.cpp
 
 serverTest: server_test.cpp
 	g++ -o serverTest server_test.cpp

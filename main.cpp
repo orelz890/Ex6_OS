@@ -84,17 +84,17 @@ int main()
     char c[1024];
     char d[1024];
 
-    // enQ(a,&q);
-    // char* de = (char*)deQ(&q);
-    // std::cout << '\n' << de << '\n';
-    // de = (char*)deQ(&q);
-    // if (de == NULL)
-    // {
-    //     std::cout << "\nElement dequeued!\n";
-    // }
-    // enQ(a,&q);
-    // de = (char*)deQ(&q);
-    // std::cout << '\n' << de << '\n';
+    enQ(a,&q, -1);
+    char* de = (char*)deQ(&q);
+    std::cout << '\n' << de << '\n';
+    de = (char*)deQ(&q);
+    if (de == NULL)
+    {
+        std::cout << "\nElement dequeued!\n";
+    }
+    enQ(a,&q, -1);
+    de = (char*)deQ(&q);
+    std::cout << '\n' << de << '\n';
 
     ao1 = newAO(createQ(),&f1,&fill_Q2);
     ao2 = newAO(createQ(),&f2,&fill_Q3);
@@ -114,5 +114,4 @@ int main()
     enQ(a,ao1->Q, -1);
 
     sleep(2);
-
 }
