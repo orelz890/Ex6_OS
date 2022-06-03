@@ -120,11 +120,8 @@ int main(int argc, char *argv[])
 
     while(1){
         std::cout<< "Enter a txt to cifer..\n";
-        fflush(stdout);
         memset(txt,0,sizeof(txt));
         std::cin.getline(txt,sizeof(txt));
-        // std::cout << "txt == " << txt << '\n';
-        // fflush(stdout);
         
         is_sent = send(sockfd, txt,sizeof(txt), 0);
         if (is_sent == -1)

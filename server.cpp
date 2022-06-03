@@ -54,7 +54,6 @@ void *f1(void *data)
     std::pair<void *, int> *p = (std::pair<void *, int> *)data;
     if (p->first != NULL)
     {
-        // std::cout << "f1-data = " << (char*)p->first << '\n';
         char *str = (char *)p->first;
         int len = strlen(str);
         for (int i = 0; i < len; i++)
@@ -71,7 +70,6 @@ void *f1(void *data)
                 }
             }
         }
-        // std::cout << "f1-ans = " << (char*)p->first << '\n';
     }
     return data;
 }
@@ -81,7 +79,6 @@ void *f2(void *data)
     std::pair<void *, int> *p = (std::pair<void *, int> *)data;
     if (p->first != NULL)
     {
-        // std::cout << "f2-data = " << (char*)p->first << '\n';
         char *str = (char *)p->first;
         int len = strlen(str);
         for (int j = 0; j < len; j++)
@@ -95,8 +92,6 @@ void *f2(void *data)
 
                 str[j] = toupper(str[j]);
             }
-            // std::cout << "f2-ans = " << (char*)p->first << '\n';
-            // fflush(stdout);
         }
         return data;
     }
@@ -174,8 +169,8 @@ void *f2(void *data)
                 perror("Recv txt error\n");
                 break;
             }
-            std::cout << txt_buf << "\n";
-            fflush(stdout);
+            // std::cout << txt_buf << "\n";
+            // fflush(stdout);
             if (strlen(txt_buf) == 0)
             {
                 std::string msg = "You pressed enter by mistake";
@@ -194,7 +189,6 @@ void *f2(void *data)
             {
                 enQ(txt_buf, ao1->Q, new_fd);
             }
-            // std::cout << "enqed: " << (char*)ao1->Q->enqueue(txt_buf,new_fd) << '\n';
         }
         close(new_fd);
         return 0;

@@ -1,7 +1,8 @@
 
 ALL_FILES=Client Server Guard Singleton serverTest Pollclient Pollserver
 all: $(ALL_FILES)
-# all: shared_object.so
+
+
 # shared_object.so: $(ALL_FILES)
 # 	g++ -shared -fPIC -pthread $(ALL_FILES) -o shared_object.so
 

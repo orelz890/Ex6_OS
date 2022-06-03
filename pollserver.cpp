@@ -149,8 +149,6 @@ void *thread_handler(void *p_reactor)
                 {
                     if (pfds[i].fd == p_r->fd)
                     {
-                        std::cout << "\nim here!!!\n";
-                        fflush(stdout);
                         close(p_r->fd);
                         del_from_pfds(pfds,i,&fd_count);
                         RemoveHandler(p_r);

@@ -17,7 +17,6 @@ void destroyAO(void* ao) {
     delete my_ao;
     my_ao = NULL;
     printf("\nAO terminated!\n");
-    fflush(stdout);
 }
 
 
@@ -28,8 +27,6 @@ AO* newAO(void* q, void* (*f1)(void*), void* (*f2)(void*)) {
 
 
 void* handleAO(void* ao) {
-    printf("Im handling this ao!\n");
-    fflush(stdout);
     AO* my_ao = (AO*)ao;
     std::pair<void*,int>* de;
     while (my_ao->is_active) {
