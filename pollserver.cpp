@@ -12,6 +12,7 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <poll.h>
+#include <csignal>
 
 #include "reactor.hpp"
 
@@ -152,10 +153,10 @@ void *thread_handler(void *p_reactor)
                         fflush(stdout);
                         close(p_r->fd);
                         del_from_pfds(pfds,i,&fd_count);
+                        RemoveHandler(p_r);
                         break;
                     }
                 }
-                pthread_cancel(p_r->t_id);
                 break;
             }
             else
@@ -179,11 +180,29 @@ void *thread_handler(void *p_reactor)
     return p_reactor;
 }
 
+void signal_handler(int signal)
+{
+    std::string msg = "server_ctrl_c";
+    for (int i = 0; i < fd_count; i++)
+    {
+        // Check that the current fd is not the listener or the sender client
+        if (pfds[i].fd != listener)
+        {
+            if (send(pfds[i].fd, msg.c_str(), msg.length(), 0) == -1)
+            {
+                perror("send commend error\n");
+            }
+            close(pfds[i].fd);
+        }
+    }
+    exit(0);
+}
+
 
 // Main
 int main(void)
 {
-
+    std::signal(SIGINT,signal_handler);
     int newfd;                          // Newly accept()ed socket descriptor
     struct sockaddr_storage remoteaddr; // Client address
     socklen_t addrlen;

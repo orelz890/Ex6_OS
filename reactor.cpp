@@ -33,7 +33,7 @@ void RemoveHandler(void* p_r)
 {
     Reactor* pr = (Reactor*)p_r;
     // Make calling thread wait for this thread termination
-    pthread_join(pr->t_id, NULL);
+    pthread_cancel(pr->t_id);
     pr->fd = -1;
     pr->func = NULL;
 }

@@ -63,17 +63,24 @@ void signal_handler(int signal)
 
 void* recv_thread_handler(void* arg)
 {
-    while(1){
     int received;
     char txt[1024];
 
     while(1){
-            memset(txt,0,sizeof(txt));
-            received = recv(sockfd,txt,sizeof(txt),0);
-            if (received == -1)
-            {
-                perror("recv error - commend response\n");
-            }
+        memset(txt,0,sizeof(txt));
+        received = recv(sockfd,txt,sizeof(txt),0);
+        if (received == -1)
+        {
+            perror("recv error - commend response\n");
+        }
+        if (strcmp(txt,"server_ctrl_c") == 0)
+        {
+            pthread_cancel(t_id);
+            close(sockfd);
+            exit(0);
+        }
+        else
+        {
             std::cout << txt << '\n';
         }
     }

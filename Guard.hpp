@@ -6,7 +6,6 @@ class Guard
 {
 private:
     pthread_mutex_t safe_lock;
-    bool active = false;
 
 public:
     Guard();
