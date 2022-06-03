@@ -22,44 +22,6 @@ int listener; // Listening socket descriptor
 int fd_count;
 struct pollfd *pfds;
 
-void *thread_handler(void *p_reactor)
-{
-    Reactor *p_r = (Reactor *)p_reactor;
-    std::string msg = "You are connected now!\n";
-    if (send(p_r->fd, msg.c_str() , msg.length(), 0) == -1)  {
-        perror("send");
-        exit(1);
-    }
-
-    char buf[BUF_SIZE];
-    while (1)
-    {
-        memset(buf, 0, BUF_SIZE);
-        if (recv(p_r->fd, buf, BUF_SIZE, 0) == -1)
-        {
-            perror("ERROR- recv");
-            close(p_r->fd);
-            exit(1);
-        }
-        else
-        {
-            std::cout << "Got from client: " << buf << '\n';
-            // Find the fd that changed and handle the changes
-            for (int i = 0; i < fd_count; i++)
-            {
-                if (pfds[i].fd != listener && pfds[i].fd == p_r->fd)
-                {
-                    printf("fd_count = %d , client_fd = %d, listener = %d ,reactor_fd = %d ", fd_count, pfds[i].fd, listener, p_r->fd);
-                    if (send(pfds[i].fd, buf, BUF_SIZE, 0) == -1)
-                    {
-                        perror("ERROR -thread_handler- send ");
-                    }
-                }
-            }
-        }
-    }
-    return p_reactor;
-}
 
 // Get sockaddr, IPv4 or IPv6:
 void *get_in_addr(struct sockaddr *sa)
@@ -154,6 +116,69 @@ void del_from_pfds(struct pollfd pfds[], int i, int *fd_count)
 
     (*fd_count)--;
 }
+
+
+void *thread_handler(void *p_reactor)
+{
+    Reactor *p_r = (Reactor *)p_reactor;
+    std::string msg = "You are connected now!\n";
+    if (send(p_r->fd, msg.c_str() , msg.length(), 0) == -1)  {
+        perror("send");
+        exit(1);
+    }
+
+    char buf[BUF_SIZE];
+
+    while (1)
+    {
+        memset(buf, 0, BUF_SIZE);
+        // Recv msg from the given client
+        if (recv(p_r->fd, buf, BUF_SIZE, 0) == -1)
+        {
+            perror("ERROR- recv");
+            close(p_r->fd);
+            exit(1);
+        }
+        else
+        {
+            // Trying to handel ctrl^c
+            if (strcmp(buf,"ctrl_c") == 0)
+            {
+                for (int i = 0; i < fd_count; i++)
+                {
+                    if (pfds[i].fd == p_r->fd)
+                    {
+                        std::cout << "\nim here!!!\n";
+                        fflush(stdout);
+                        close(p_r->fd);
+                        del_from_pfds(pfds,i,&fd_count);
+                        break;
+                    }
+                }
+                pthread_cancel(p_r->t_id);
+                break;
+            }
+            else
+            {          
+                std::cout << "Got from client: " << buf << '\n';
+                // Brodcast this client msg
+                for (int i = 0; i < fd_count; i++)
+                {
+                    // Check that the current fd is not the listener or the sender client
+                    if (pfds[i].fd != listener && pfds[i].fd != p_r->fd)
+                    {
+                        if (send(pfds[i].fd, buf, BUF_SIZE, 0) == -1)
+                        {
+                            perror("ERROR -thread_handler- send ");
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return p_reactor;
+}
+
 
 // Main
 int main(void)

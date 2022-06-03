@@ -14,12 +14,14 @@
 #include <arpa/inet.h>
 #include <iostream>
 #include <csignal>
+#include <pthread.h>
 
 #define PORT "9034" // the port client will be connecting to 
 
 #define MAXDATASIZE 1024 // max number of bytes we can get at once 
-int sockfd, numbytes;  
-
+int sockfd, numbytes;
+std::string nickname;
+pthread_t t_id;
 
 // get sockaddr, IPv4 or IPv6:
 void *incoming_addr(struct sockaddr *sock_addr)
@@ -46,6 +48,7 @@ bool str_comp(std::string a, std::string b){
 
 void signal_handler(int signal)
 {
+    pthread_cancel(t_id);
     std::string msg = "ctrl_c";
     int is_sent = send(sockfd, msg.c_str(),msg.length(), 0);
     if (is_sent == -1)
@@ -58,10 +61,40 @@ void signal_handler(int signal)
 }
 
 
+void* recv_thread_handler(void* arg)
+{
+    while(1){
+    int received;
+    char txt[1024];
+
+    while(1){
+            memset(txt,0,sizeof(txt));
+            received = recv(sockfd,txt,sizeof(txt),0);
+            if (received == -1)
+            {
+                perror("recv error - commend response\n");
+            }
+            std::cout << txt << '\n';
+        }
+    }
+    return NULL;
+}
+
+
 int main(int argc, char *argv[])
 {
     std::signal(SIGINT,signal_handler);
     char buf[MAXDATASIZE];
+    memset(buf,0,MAXDATASIZE);
+
+    std::cout<< "Whats your name?\n";
+    fflush(stdout);
+    std::cin.getline(buf,MAXDATASIZE);
+    nickname.clear();
+    nickname = buf;
+    nickname.append("# ");
+    memset(buf,0,MAXDATASIZE);
+
     struct addrinfo hints, *servinfo, *p;
     int rv;
     char s[INET6_ADDRSTRLEN];
@@ -115,33 +148,32 @@ int main(int argc, char *argv[])
     buf[numbytes] = '\0';
 
     printf("client: received '%s'\n",buf);    
-    int is_sent, received;
+
+    int err = pthread_create(&t_id, NULL, recv_thread_handler, NULL);
+    if (err)
+    {
+        std::cout << "Pthread create error!";
+    }
+
+    int is_sent;
     char txt[1024];
+    std::string msg;
 
     while(1){
-        std::cout<< "Write a msg to the server# ";
-        fflush(stdout);
+        msg.clear();
         memset(txt,0,sizeof(txt));
+        msg.append(nickname);
         std::cin.getline(txt,sizeof(txt));
-        // std::cout << "txt == " << txt << '\n';
-        // fflush(stdout);
-        
-        is_sent = send(sockfd, txt,sizeof(txt), 0);
+        msg.append(txt);
+
+        is_sent = send(sockfd, msg.c_str(),msg.length(), 0);
         if (is_sent == -1)
         {
             perror("send commend error\n");
             exit(1);
         }
+    }
 
-        sleep(0.1);
-        memset(txt,0,sizeof(txt));
-        received = recv(sockfd,txt,sizeof(txt),0);
-        if (received == -1)
-        {
-            perror("recv error - commend response\n");
-        }
-        std::cout << "Server returned: "<< txt << '\n';
-    }    
     close(sockfd);
 
     return 0;
