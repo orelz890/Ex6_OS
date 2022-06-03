@@ -88,13 +88,13 @@ int main()
 
     // Upper case
     send_msg(sock, "E");
-    check_the_response(sock, "F");
+    check_the_response(sock, "f");
     send_msg(sock, "F");
-    check_the_response(sock, "G");
+    check_the_response(sock, "g");
     send_msg(sock, "ABCD");
-    check_the_response(sock, "BCDE");
+    check_the_response(sock, "bcde");
     send_msg(sock, "HAL");
-    check_the_response(sock, "IBM");
+    check_the_response(sock, "ibm");
 
 // ================================================= Special cases =================================================
 
@@ -105,7 +105,7 @@ int main()
     send_msg(sock, " ");
     check_the_response(sock, " ");
     send_msg(sock, "a A");
-    check_the_response(sock, "B B");
+    check_the_response(sock, "B b");
     send_msg(sock, "1");
     check_the_response(sock, "1");
     send_msg(sock, "1 2");
@@ -125,7 +125,7 @@ int main()
     send_msg(sock, "z");
     check_the_response(sock, "A");
     send_msg(sock, "Z");
-    check_the_response(sock, "A");
+    check_the_response(sock, "a");
     send_msg(sock, "tuvwxyzab");
     check_the_response(sock, "UVWXYZABC");
     cout << "\n\n";
